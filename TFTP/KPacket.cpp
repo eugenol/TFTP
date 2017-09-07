@@ -6,10 +6,10 @@
 
 std::vector<char> KPacket::ShortToChar( unsigned short in )
 {
-  std::vector<char> temp;
-  temp.push_back( in >> 8 & 0xff );
-  temp.push_back( in & 0xff );
-  return temp;
+	std::vector<char> temp;
+	temp.push_back( in >> 8 & 0xff );
+	temp.push_back( in & 0xff );
+	return temp;
 }
 
 KRRQPacket::KRRQPacket( std::string fileName, std::string mode )
@@ -79,7 +79,7 @@ KDATAPacket::~KDATAPacket()
 //==============================================================================
 
 KDATAPacketReceiver::KDATAPacketReceiver( std::ofstream& outfile )
-  : m_outfile( outfile )
+	: m_outfile( outfile )
 {
 }
 

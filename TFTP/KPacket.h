@@ -17,7 +17,7 @@ public:
 	KPacket() {}
 	virtual ~KPacket() {}
 
-	virtual const char* GetPacket() const = 0;
+	virtual const char* GetPacketData() const = 0;
 	virtual int	GetPacketLength() const = 0;
 	static std::vector<char> ShortToChar( unsigned short in );
 
@@ -32,7 +32,7 @@ public:
 	KRRQPacket( std::string fileName, std::string mode = "octet" );
 	~KRRQPacket();
 
-	const char* GetPacket() const override { return m_dataPtr; }
+	const char* GetPacketData() const override { return m_dataPtr; }
 	int	GetPacketLength() const override { return m_packetLength; }
 
 private:
@@ -49,7 +49,7 @@ public:
 	KACKPacket( unsigned short block );
 	~KACKPacket();
 
-	const char* GetPacket() const override { return m_dataPtr; }
+	const char* GetPacketData() const override { return m_dataPtr; }
 	int	GetPacketLength() const override { return m_packetLength; }
 
 private:
@@ -66,7 +66,7 @@ public:
 	KDATAPacket( unsigned short block, std::vector<char>& data );
 	~KDATAPacket();
 
-	const char* GetPacket() const override { return m_dataPtr; }
+	const char* GetPacketData() const override { return m_dataPtr; }
 	int	GetPacketLength() const override { return m_packetLength; }
 
 private:
