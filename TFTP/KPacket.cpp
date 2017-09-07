@@ -1,7 +1,5 @@
-#include "stdafx.h"
-#include "KPacket.h"
 #include <iostream>
-
+#include "KPacket.h"
 //------------------------------------------------------------------------------
 
 std::vector<char> KPacket::ShortToChar( unsigned short in )

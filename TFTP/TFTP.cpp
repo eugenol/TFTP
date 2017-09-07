@@ -1,13 +1,11 @@
-// TFTP.cpp : Defines the entry point for the console application.
-//
+/*Bascic TFTP program*/
 
-#include "stdafx.h"
 #include <windows.h>
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "KPacket.h"
 #include <vector>
+#include "KPacket.h"
 
 #pragma comment( lib, "Ws2_32.lib" )
 

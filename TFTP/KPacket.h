@@ -1,5 +1,5 @@
 #pragma once
-#include <winsock.h>
+#include <windows.h>
 #include <string>
 #include <fstream>
 #include <memory>
