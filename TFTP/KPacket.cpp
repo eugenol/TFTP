@@ -6,10 +6,8 @@
 
 void KPacket::ShortToChar(unsigned short in, char* out)
 {
-	char * ptr = reinterpret_cast<char *>(&in);
-
-	out[0] = ptr[0];
-	out[1] = ptr[1];
+	out[0] = (in >> 8) & 0xff;
+	out[1] = in & 0xff;
 }
 
 KRRQPacket::KRRQPacket(std::string fileName, std::string mode)
@@ -149,6 +147,7 @@ int KDATAPacketReceiver::operator()(char* data, int recv_count)
 	if ( ( recv_count - 4 > 0 ) && (blockNum == m_expectedBlockNum))
 	{
 		m_byteCount += recv_count - 4;
+		m_blockCount++;
 		m_expectedBlockNum++;
 		m_outfile.write( data, recv_count - 4);
 	}

@@ -12,21 +12,16 @@
 
 int main(int argc, char** argv)
 {
+	if (argc < 4)
+	{
+		std::cout << "Usage is: tftp [host IP address] GET [filename]\n";
+		return -1;
+	}
+	
+	std::string serverIP(argv[1]);
+	std::string targetFile(argv[3]);
+
 	WSADATA winsock_information;
-
-	std::string serverIP("146.230.194.143");
-	u_short serverPort(69);
-	std::string targetFile("test.txt");
-
-	//if (argc != 3)
-	//{
-	//	std::cout << "Usage is: tftp [hostname] [filename]\n";
-	//	return 1;
-	//}
-	//else
-	//{
-	//	
-	//}
 
 	//Initilise Winsock
 	if(WSAStartup(MAKEWORD(2,0), &winsock_information) != 0)
@@ -35,7 +30,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	if (!(LOBYTE(winsock_information.wVersion) == 2 && HIBYTE(winsock_information.wVersion) == 0)) \
+	if (!(LOBYTE(winsock_information.wVersion) == 2 && HIBYTE(winsock_information.wVersion) == 0))
 	{
 		std::cout << "Can't find a suitable Winsock\n";
 		WSACleanup();
@@ -43,6 +38,8 @@ int main(int argc, char** argv)
 	}
 
 	//Main body here
+
+	u_short serverPort(69);
 	SOCKET sd;
 	struct sockaddr_in server_address;
 
