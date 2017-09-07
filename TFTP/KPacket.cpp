@@ -4,13 +4,13 @@
 
 //------------------------------------------------------------------------------
 
-void KPacket::ShortToChar(unsigned short in, char* out)
+void KPacket::ShortToChar( unsigned short in, char* out )
 {
 	out[0] = (in >> 8) & 0xff;
 	out[1] = in & 0xff;
 }
 
-KRRQPacket::KRRQPacket(std::string fileName, std::string mode)
+KRRQPacket::KRRQPacket( std::string fileName, std::string mode )
 {
 	char opcode[2] = { 0x00, static_cast<char>(PacketType::RRQ) };
 	u_char padding = 0x00;
@@ -21,13 +21,13 @@ KRRQPacket::KRRQPacket(std::string fileName, std::string mode)
 	m_packet[messageIndex++] = opcode[0];
 	m_packet[messageIndex++] = opcode[1];
 
-	for (size_t i = 0; i < fileName.length(); ++i)
+	for( size_t i = 0; i < fileName.length(); ++i )
 	{
 		m_packet[messageIndex++] = fileName[i];
 	}
 	m_packet[messageIndex++] = padding;
 
-	for (size_t i = 0; i < mode.length(); ++i)
+	for( size_t i = 0; i < mode.length(); ++i )
 	{
 		m_packet[messageIndex++] = mode[i];
 	}
@@ -40,7 +40,7 @@ KRRQPacket::KRRQPacket(std::string fileName, std::string mode)
 
 KRRQPacket::~KRRQPacket()
 {
-	if (m_packet)
+	if ( m_packet )
 	{
 		delete[] m_packet;
 	}
@@ -48,7 +48,7 @@ KRRQPacket::~KRRQPacket()
 
 //==============================================================================
 
-KACKPacket::KACKPacket(unsigned short block)
+KACKPacket::KACKPacket( unsigned short block )
 {
 	char opcode[2] = { 0x00, static_cast<char>(PacketType::ACK) };
 
@@ -67,7 +67,7 @@ KACKPacket::KACKPacket(unsigned short block)
 
 KACKPacket::~KACKPacket()
 {
-	if(m_packet)
+	if( m_packet )
 	{
 		delete[] m_packet;
 	}
@@ -83,7 +83,7 @@ KDATAPacket::KDATAPacket(unsigned short block, char* data, int dataSize)
 
 	char blocknum[2];
 
-	ShortToChar(block, blocknum);
+	ShortToChar( block, blocknum );
 
 	int messageIndex = 0;
 	m_packet[messageIndex++] = opcode[0];
@@ -103,7 +103,7 @@ KDATAPacket::KDATAPacket(unsigned short block, char* data, int dataSize)
 
 KDATAPacket::~KDATAPacket()
 {
-	if(m_packet)
+	if( m_packet )
 	{
 		delete m_packet;
 	}
@@ -111,7 +111,8 @@ KDATAPacket::~KDATAPacket()
 
 //==============================================================================
 
-KDATAPacketReceiver::KDATAPacketReceiver(std::ofstream& outfile): m_outfile(outfile)
+KDATAPacketReceiver::KDATAPacketReceiver( std::ofstream& outfile )
+  : m_outfile( outfile )
 {
 }
 
@@ -123,17 +124,17 @@ KDATAPacketReceiver::~KDATAPacketReceiver()
 
 //------------------------------------------------------------------------------
 
-int KDATAPacketReceiver::operator()(char* data, int recv_count)
+int KDATAPacketReceiver::operator()( char* data, int recv_count )
 {
-	if (recv_count == SOCKET_ERROR)
+	if( recv_count == SOCKET_ERROR )
 	{
 		std::cout << "Error receiving data\n";
 		return -1;
 	}
 
-	if (data[1] != static_cast<char>(PacketType::DATA))
+	if( data[1] != static_cast<char>(PacketType::DATA) )
 	{
-		if (data[1] == static_cast<char>(PacketType::ERROR_PACKET))
+		if( data[1] == static_cast<char>(PacketType::ERROR_PACKET) )
 		{
 			std::cout << "Error packet received\n";
 			return -1;
@@ -142,9 +143,9 @@ int KDATAPacketReceiver::operator()(char* data, int recv_count)
 		return -1;
 	}
 
-	unsigned short blockNum = CharToShort(&data[2]);
+	unsigned short blockNum = CharToShort( &data[2] );
 
-	if ( ( recv_count - 4 > 0 ) && (blockNum == m_expectedBlockNum))
+	if( ( recv_count - 4 > 0 ) && ( blockNum == m_expectedBlockNum ) )
 	{
 		m_byteCount += recv_count - 4;
 		m_blockCount++;
@@ -152,7 +153,7 @@ int KDATAPacketReceiver::operator()(char* data, int recv_count)
 		m_outfile.write( data, recv_count - 4);
 	}
 
-	if (recv_count - 4 != 512)
+	if( recv_count != MAX_TFTP_PACKET_LENGTH )
 	{
 		m_trasnsferComplete = true;
 	}
@@ -162,30 +163,30 @@ int KDATAPacketReceiver::operator()(char* data, int recv_count)
 
 //------------------------------------------------------------------------------
 
-unsigned short KDATAPacketReceiver::CharToShort(char msg[])
+unsigned short KDATAPacketReceiver::CharToShort( char msg[] )
 {
 	return (static_cast<unsigned short>(msg[0]) << 8) | static_cast<unsigned short>(msg[1]);
 }
 
 //==============================================================================
 
-std::unique_ptr<KPacket> KPacketFactory::MakePacket(std::string fileName, std::string mode)
+std::unique_ptr<KPacket> KPacketFactory::MakePacket( std::string fileName, std::string mode )
 {
-	return std::make_unique<KRRQPacket>(fileName, mode);
+	return std::make_unique<KRRQPacket>( fileName, mode );
 }
 
 //------------------------------------------------------------------------------
 
-std::unique_ptr<KPacket> KPacketFactory::MakePacket(unsigned short block)
+std::unique_ptr<KPacket> KPacketFactory::MakePacket( unsigned short block )
 {
-	return std::make_unique<KACKPacket>(block);
+	return std::make_unique<KACKPacket>( block );
 }
 
 //------------------------------------------------------------------------------
 
-std::unique_ptr<KPacket> KPacketFactory::MakePacket(unsigned short block, char* data, int dataSize)
+std::unique_ptr<KPacket> KPacketFactory::MakePacket( unsigned short block, char* data, int dataSize )
 {
-	return std::make_unique<KDATAPacket>(block, data, dataSize);
+	return std::make_unique<KDATAPacket>( block, data, dataSize );
 }
 
 //------------------------------------------------------------------------------
