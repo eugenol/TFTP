@@ -3,11 +3,11 @@
 #include <string>
 #include <fstream>
 #include <memory>
+#include <vector>
 
 //------------------------------------------------------------------------------
 
 const int MAX_TFTP_PACKET_LENGTH = 516;
-enum class PacketType : char { RRQ = 1, WRQ, DATA, ACK, ERROR_PACKET };
 
 //==============================================================================
 
@@ -17,10 +17,11 @@ public:
 	KPacket() {}
 	virtual ~KPacket() {}
 
-	virtual char* GetPacket() const = 0;
+	virtual const char* GetPacket() const = 0;
 	virtual int	GetPacketLength() const = 0;
+	static std::vector<char> ShortToChar( unsigned short in );
 
-	static void ShortToChar( unsigned short in, char* out );
+	enum PacketType : char { RRQ = 1, WRQ, DATA, ACK, ERROR_PACKET };
 };
 
 //==============================================================================
@@ -31,11 +32,12 @@ public:
 	KRRQPacket( std::string fileName, std::string mode = "octet" );
 	~KRRQPacket();
 
-  char* GetPacket() const override { return m_packet; }
-  int	GetPacketLength() const override { return m_packetLength; }
+	const char* GetPacket() const override { return m_dataPtr; }
+	int	GetPacketLength() const override { return m_packetLength; }
 
 private:
-	char* m_packet = nullptr;
+	std::vector<char> m_packet;
+	const char* m_dataPtr = nullptr;
 	int m_packetLength = 0;
 };
 
@@ -47,11 +49,12 @@ public:
 	KACKPacket( unsigned short block );
 	~KACKPacket();
 
-  char* GetPacket() const override { return m_packet; }
-  int	GetPacketLength() const override { return m_packetLength; }
+	const char* GetPacket() const override { return m_dataPtr; }
+	int	GetPacketLength() const override { return m_packetLength; }
 
 private:
-	char* m_packet = nullptr;
+	std::vector<char> m_packet;
+	const char* m_dataPtr = nullptr;
 	int m_packetLength = 0;
 };
 
@@ -60,14 +63,15 @@ private:
 class KDATAPacket : public KPacket
 {
 public:
-	KDATAPacket( unsigned short block, char* data, int dataSize );
+	KDATAPacket( unsigned short block, std::vector<char>& data );
 	~KDATAPacket();
 
-  char* GetPacket() const override { return m_packet; }
-  int	GetPacketLength() const override { return m_packetLength; }
+	const char* GetPacket() const override { return m_dataPtr; }
+	int	GetPacketLength() const override { return m_packetLength; }
 
 private:
-	char* m_packet = nullptr;
+	std::vector<char> m_packet;
+	const char* m_dataPtr = nullptr;
 	int m_packetLength = 0;
 };
 
@@ -79,7 +83,7 @@ public:
 	KDATAPacketReceiver( std::ofstream& outfile );
 	~KDATAPacketReceiver();
 
-	int operator()( char* data, int recv_count );
+	int operator()( std::vector<char> data, int recv_count);
 	long GetBlockCount() const { return m_blockCount; }
 	long GetByteCount() const { return m_byteCount;  }
 	bool IsTransferComplete() const { return m_trasnsferComplete; }
@@ -105,7 +109,7 @@ public:
 
 	static std::unique_ptr<KPacket> MakePacket( std::string fileName, std::string mode = "octet" );
 	static std::unique_ptr<KPacket> MakePacket( unsigned short block );
-	static std::unique_ptr<KPacket> MakePacket( unsigned short block, char* data, int dataSize );
+	static std::unique_ptr<KPacket> MakePacket( unsigned short block, std::vector<char>& data);
 };
 
 //==============================================================================

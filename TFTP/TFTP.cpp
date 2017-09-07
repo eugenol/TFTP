@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include "KPacket.h"
+#include <vector>
 
 #pragma comment( lib, "Ws2_32.lib" )
 
@@ -33,7 +34,7 @@ int main( int argc, char** argv )
 	}
 
 	if( !( LOBYTE ( winsock_information.wVersion ) == 2 
-      && HIBYTE( winsock_information.wVersion ) == 0) )
+		&& HIBYTE( winsock_information.wVersion ) == 0) )
 	{
 		std::cout << "Can't find a suitable Winsock\n";
 		WSACleanup();
@@ -58,11 +59,11 @@ int main( int argc, char** argv )
 	else
 	{
 		//Send Request
-    Packet rrq = KPacketFactory::MakePacket( targetFile );
+		Packet rrq = KPacketFactory::MakePacket( targetFile );
 		
-		int send_count = sendto( socketDescriptor, reinterpret_cast<const char*>( rrq->GetPacket() ),
-							               rrq->GetPacketLength(), 0, reinterpret_cast<const struct sockaddr*>( &serverAddress ),
-                             sizeof( struct sockaddr_in ) );
+		int send_count = sendto( socketDescriptor, rrq->GetPacket(), rrq->GetPacketLength(), 0,
+								reinterpret_cast<const struct sockaddr*>( &serverAddress ),
+								sizeof( struct sockaddr_in ) );
 		
 		if( send_count == SOCKET_ERROR || send_count != rrq->GetPacketLength() )
 		{
@@ -70,23 +71,23 @@ int main( int argc, char** argv )
 			return -1;
 		}
 
-    //Income address from server
+		//Income address from server
 		struct sockaddr_in incoming_address;
 		int addressSize;
 		int recvCount;
-		char buffer[MAX_TFTP_PACKET_LENGTH];
+		std::vector<char> buffer(MAX_TFTP_PACKET_LENGTH);
 		std::ofstream outfile( targetFile, std::ofstream::binary );
 
-    //Received Packet Handler 
+		//Received Packet Handler 
 		KDATAPacketReceiver pktReceiver(outfile);
 
 		//loop to receive
 		while(true)
 		{
 			addressSize = sizeof( struct sockaddr_in );
-			recvCount = recvfrom( socketDescriptor, buffer, MAX_TFTP_PACKET_LENGTH, 0,
-                            reinterpret_cast<struct sockaddr*>( &incoming_address ),
-                            &addressSize);
+			recvCount = recvfrom( socketDescriptor, &buffer[0], MAX_TFTP_PACKET_LENGTH, 0,
+								reinterpret_cast<struct sockaddr*>( &incoming_address ),
+								&addressSize);
 
 			int retVal = pktReceiver(buffer, recvCount);
 
@@ -95,11 +96,11 @@ int main( int argc, char** argv )
 				break;
 			}
 			
-      Packet ack = KPacketFactory::MakePacket( static_cast<short>( retVal ) );
+			Packet ack = KPacketFactory::MakePacket( static_cast<short>( retVal ) );
 
-			send_count = sendto( socketDescriptor, reinterpret_cast<const char*>( ack->GetPacket() ),
-                           ack->GetPacketLength(), 0, reinterpret_cast<const struct sockaddr*>( &incoming_address ),
-                           addressSize );
+			send_count = sendto( socketDescriptor,ack->GetPacket(), ack->GetPacketLength(), 0,
+								reinterpret_cast<const struct sockaddr*>( &incoming_address ),
+								addressSize );
 
 			if( send_count == SOCKET_ERROR || send_count != ack->GetPacketLength() )
 			{
