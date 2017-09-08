@@ -18,7 +18,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="KPacket.h">
+    <ClInclude Include="Network.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Packets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -26,7 +29,10 @@
     <ClCompile Include="TFTP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KPacket.cpp">
+    <ClCompile Include="Network.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Packets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

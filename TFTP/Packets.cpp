@@ -1,5 +1,5 @@
 #include <iostream>
-#include "KPacket.h"
+#include "Packets.h"
 //------------------------------------------------------------------------------
 
 std::vector<char> KPacket::ShortToChar( unsigned short in )
@@ -89,23 +89,15 @@ KDATAPacketReceiver::~KDATAPacketReceiver()
 
 //------------------------------------------------------------------------------
 
-int KDATAPacketReceiver::operator()( std::vector<char> data, int recv_count )
+void KDATAPacketReceiver::operator()( std::vector<char> data, int recv_count )
 {
-	if (recv_count == SOCKET_ERROR)
-	{
-		std::cout << "Error receiving data\n";
-		return -1;
-	}
-
 	if (data[1] != KPacket::DATA)
 	{
 		if (data[1] == KPacket::ERROR_PACKET)
 		{
-			std::cout << "Error packet received\n";
-			return -1;
+			throw KPacketReceiverException("ERROR Packet");
 		}
-		std::cout << "Not data packet received\n";
-		return -1;
+		throw KPacketReceiverException("Unexpected Packet");
 	}
 
 	unsigned short blockNum = CharToShort(&data[2]);
@@ -120,10 +112,10 @@ int KDATAPacketReceiver::operator()( std::vector<char> data, int recv_count )
 
 	if (recv_count != MAX_TFTP_PACKET_LENGTH)
 	{
-	
+		m_trasnsferComplete = true;
 	}
 
-	return blockNum;
+	m_receivedBlockNum = blockNum;
 }
 
 //------------------------------------------------------------------------------
@@ -134,25 +126,4 @@ unsigned short KDATAPacketReceiver::CharToShort( char msg[] )
 }
 
 //==============================================================================
-
-std::unique_ptr<KPacket> KPacketFactory::MakePacket( std::string fileName, std::string mode )
-{
-	return std::make_unique<KRRQPacket>( fileName, mode );
-}
-
-//------------------------------------------------------------------------------
-
-std::unique_ptr<KPacket> KPacketFactory::MakePacket( unsigned short block )
-{
-	return std::make_unique<KACKPacket>( block );
-}
-
-//------------------------------------------------------------------------------
-
-std::unique_ptr<KPacket> KPacketFactory::MakePacket(unsigned short block, std::vector<char>& data)
-{
-	return std::make_unique<KDATAPacket>( block, data );
-}
-
-//------------------------------------------------------------------------------
 

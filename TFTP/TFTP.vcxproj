@@ -146,10 +146,12 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="KPacket.h" />
+    <ClInclude Include="Network.h" />
+    <ClInclude Include="Packets.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="KPacket.cpp" />
+    <ClCompile Include="Network.cpp" />
+    <ClCompile Include="Packets.cpp" />
     <ClCompile Include="TFTP.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

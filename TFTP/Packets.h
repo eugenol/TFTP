@@ -1,8 +1,7 @@
 #pragma once
-#include <windows.h>
+#include <winsock.h>
 #include <string>
 #include <fstream>
-#include <memory>
 #include <vector>
 
 //------------------------------------------------------------------------------
@@ -83,15 +82,17 @@ public:
 	KDATAPacketReceiver( std::ofstream& outfile );
 	~KDATAPacketReceiver();
 
-	int operator()( std::vector<char> data, int recv_count);
+	void operator()( std::vector<char> data, int recv_count);
 	long GetBlockCount() const { return m_blockCount; }
 	long GetByteCount() const { return m_byteCount;  }
+	unsigned short GetLastBlockNum() const { return m_receivedBlockNum;  }
 	bool IsTransferComplete() const { return m_trasnsferComplete; }
 
 private:
 	unsigned short CharToShort( char msg[] );
 
 	std::ofstream& m_outfile;
+	unsigned short m_receivedBlockNum = 0;
 	unsigned short m_expectedBlockNum = 1;
 	long m_blockCount = 0;
 	long m_byteCount = 0;
@@ -101,15 +102,9 @@ private:
 
 //==============================================================================
 
-class KPacketFactory
-{
+class KPacketReceiverException : public std::runtime_error {
 public:
-	KPacketFactory() = delete;
-	~KPacketFactory() = delete;
-
-	static std::unique_ptr<KPacket> MakePacket( std::string fileName, std::string mode = "octet" );
-	static std::unique_ptr<KPacket> MakePacket( unsigned short block );
-	static std::unique_ptr<KPacket> MakePacket( unsigned short block, std::vector<char>& data);
+	KPacketReceiverException(std::string error) : std::runtime_error(error) { }
 };
 
 //==============================================================================
