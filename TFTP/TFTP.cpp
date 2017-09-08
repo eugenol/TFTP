@@ -35,7 +35,7 @@ int main( int argc, char** argv )
 		//Received Packet Handler 
 		KDATAPacketReceiver pktReceiver(outfile);
 
-		while (true)
+		while (!pktReceiver.IsTransferComplete())
 		{
 			struct sockaddr_in incomingAddress = socket.RecvFrom(pktReceiver);
 
@@ -46,15 +46,10 @@ int main( int argc, char** argv )
 			std::cout << pktReceiver.GetByteCount() << " bytes received in ";
 			std::cout << pktReceiver.GetBlockCount();
 			pktReceiver.GetBlockCount() == 1 ? std::cout << " block.\n"
-				: std::cout << " blocks.\n";
-
-			if (pktReceiver.IsTransferComplete())
-			{
-				std::cout << "Transfer Complete\n";
-				break;
-			}
+																			 : std::cout << " blocks.\n";
 
 		}
+		std::cout << "Transfer Complete\n";
 	}
 	catch (std::system_error& e)
 	{
