@@ -1,5 +1,3 @@
-/*Bascic TFTP program*/
-
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -28,26 +26,22 @@ int main( int argc, char** argv )
 
 		std::ofstream outfile(targetFile, std::ofstream::binary);
 
-		//Construct Receive Request
+		//Construct Receive Request and send request
 		KRRQPacket rrq(targetFile);
 		socket.SendTo(serverIP, 69, rrq);
-
-		//Received Packet Handler 
+		//Received Data Packet Handler 
 		KDATAPacketReceiver pktReceiver(outfile);
 
 		while (!pktReceiver.IsTransferComplete())
 		{
 			struct sockaddr_in incomingAddress = socket.RecvFrom(pktReceiver);
-
 			KACKPacket ack(pktReceiver.GetLastBlockNum());
-
 			socket.SendTo(incomingAddress, ack);
 
 			std::cout << pktReceiver.GetByteCount() << " bytes received in ";
 			std::cout << pktReceiver.GetBlockCount();
 			pktReceiver.GetBlockCount() == 1 ? std::cout << " block.\n"
 																			 : std::cout << " blocks.\n";
-
 		}
 		std::cout << "Transfer Complete\n";
 	}
@@ -59,7 +53,6 @@ int main( int argc, char** argv )
 	{
 		std::cout << e.what();
 	}
-
 	return 0;
 }
 

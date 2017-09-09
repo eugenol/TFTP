@@ -83,9 +83,9 @@ sockaddr_in KUDPScocket::RecvFrom( KDATAPacketReceiver& dataReceiver )
 {
 	struct sockaddr_in incomingAddress;
 	int addressSize = sizeof(struct sockaddr_in);
-	std::vector<char> buffer(MAX_TFTP_PACKET_LENGTH);
+	std::vector<unsigned char> buffer(MAX_TFTP_PACKET_LENGTH);
 
-	int recvCount = recvfrom(m_socketDescriptor, buffer.data(),
+	int recvCount = recvfrom(m_socketDescriptor, reinterpret_cast<char*>(buffer.data()),
 														MAX_TFTP_PACKET_LENGTH, 0,
 														reinterpret_cast<struct sockaddr*>(&incomingAddress),
 														&addressSize);

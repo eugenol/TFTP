@@ -18,9 +18,9 @@ public:
 
 	virtual const char* GetPacketData() const = 0;
 	virtual int	GetPacketLength() const = 0;
-	static std::vector<char> ShortToChar( unsigned short in );
+	static std::vector<unsigned char> ShortToChar( unsigned short in );
 
-	enum PacketType : char { RRQ = 1, WRQ, DATA, ACK, ERROR_PACKET };
+	enum PacketType : unsigned char { RRQ = 1, WRQ, DATA, ACK, ERROR_PACKET };
 };
 
 //==============================================================================
@@ -35,7 +35,7 @@ public:
 	int	GetPacketLength() const override { return m_packetLength; }
 
 private:
-	std::vector<char> m_packet;
+	std::vector<unsigned char> m_packet;
 	const char* m_dataPtr = nullptr;
 	int m_packetLength = 0;
 };
@@ -52,7 +52,7 @@ public:
 	int	GetPacketLength() const override { return m_packetLength; }
 
 private:
-	std::vector<char> m_packet;
+	std::vector<unsigned char> m_packet;
 	const char* m_dataPtr = nullptr;
 	int m_packetLength = 0;
 };
@@ -62,14 +62,14 @@ private:
 class KDATAPacket : public KPacket
 {
 public:
-	KDATAPacket( unsigned short block, std::vector<char>& data );
+	KDATAPacket( unsigned short block, std::vector<unsigned char>& data );
 	~KDATAPacket();
 
 	const char* GetPacketData() const override { return m_dataPtr; }
 	int	GetPacketLength() const override { return m_packetLength; }
 
 private:
-	std::vector<char> m_packet;
+	std::vector<unsigned char> m_packet;
 	const char* m_dataPtr = nullptr;
 	int m_packetLength = 0;
 };
@@ -82,14 +82,14 @@ public:
 	KDATAPacketReceiver( std::ofstream& outfile );
 	~KDATAPacketReceiver();
 
-	void operator()( std::vector<char> data, int recv_count);
+	void operator()( std::vector<unsigned char> data, int recv_count);
 	long GetBlockCount() const { return m_blockCount; }
 	long GetByteCount() const { return m_byteCount;  }
 	unsigned short GetLastBlockNum() const { return m_receivedBlockNum;  }
 	bool IsTransferComplete() const { return m_trasnsferComplete; }
 
 private:
-	unsigned short CharToShort( char msg[] );
+	unsigned short CharToShort(unsigned char* msg );
 
 	std::ofstream& m_outfile;
 	unsigned short m_receivedBlockNum = 0;
